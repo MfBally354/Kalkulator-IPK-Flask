@@ -17,10 +17,9 @@
 ## 📸 Demo
 
 <div align="center">
-  <img src="https://via.placeholder.com/800x400/667eea/ffffff?text=Kalkulator+IPK+Screenshot" alt="Screenshot Aplikasi" width="80%">
+  <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/050e486c-887b-4dd1-95d7-6c339b14cf31" />
 </div>
 
-> **Catatan:** Ganti placeholder di atas dengan screenshot aplikasi Anda yang sebenarnya
 
 ---
 
