@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Perhitungan IPK</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Riwayat Perhitungan</h1>
+            <p>Lihat semua perhitungan IPK yang telah disimpan</p>
+        </header>
+
+        <nav>
+            <a href="/">Kalkulator</a>
+            <a href="/history" class="active">Riwayat</a>
+        </nav>
+
+        <div class="history-section">
+            {% if data %}
+                <div class="history-header">
+                    <h2>Total: {{ data|length }} perhitungan</h2>
+                    <form action="/clear-history" method="POST" style="display: inline;">
+                        <button type="submit" class="btn-delete" onclick="return confirm('Yakin ingin menghapus semua riwayat?')">
+                            Hapus Semua
+                        </button>
+                    </form>
+                </div>
+
+                {% for item in data %}
+                <div class="history-item">
+                    <div class="history-header-info">
+                        <span class="timestamp">{{ item.timestamp }}</span>
+                        <span class="ipk-badge">IPK: {{ item.ipk }}</span>
+                    </div>
+                    
+                    <div class="matkul-details">
+                        <h4>Daftar Mata Kuliah ({{ item.mata_kuliah|length }} MK):</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Mata Kuliah</th>
+                                    <th>SKS</th>
+                                    <th>Nilai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for mk in item.mata_kuliah %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ mk.nama }}</td>
+                                    <td>{{ mk.sks }}</td>
+                                    <td><span class="grade-badge">{{ mk.nilai }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <h3>Belum ada riwayat perhitungan</h3>
+                    <p>Silakan hitung IPK terlebih dahulu</p>
+                    <a href="/" class="btn-calculate">Mulai Hitung IPK</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

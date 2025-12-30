@@ -1,0 +1,29 @@
+[
+    {
+        "timestamp": "2025-12-30 19:51:42",
+        "mata_kuliah": [
+            {
+                "nama": "Manajemen sekolah",
+                "sks": 2,
+                "nilai": "A-"
+            }
+        ],
+        "ipk": 3.7
+    },
+    {
+        "timestamp": "2025-12-30 19:52:00",
+        "mata_kuliah": [
+            {
+                "nama": "Manajemen sekolah",
+                "sks": 2,
+                "nilai": "A-"
+            },
+            {
+                "nama": "Pancasila",
+                "sks": 2,
+                "nilai": "A"
+            }
+        ],
+        "ipk": 3.85
+    }
+]

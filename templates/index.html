@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator IPK</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Kalkulator IPK</h1>
+            <p>Hitung Indeks Prestasi Kumulatif dengan mudah</p>
+        </header>
+
+        <nav>
+            <a href="/" class="active">Kalkulator</a>
+            <a href="/history">Riwayat</a>
+        </nav>
+
+        <div class="calculator-section">
+            <div class="input-section">
+                <h2>Input Mata Kuliah</h2>
+                <div id="matkul-list">
+                    <!-- Mata kuliah akan ditambahkan di sini -->
+                </div>
+                <button onclick="tambahMatkul()" class="btn-add">+ Tambah Mata Kuliah</button>
+            </div>
+
+            <div class="result-section">
+                <button onclick="hitungIPK()" class="btn-calculate">Hitung IPK</button>
+                <div id="result" class="result-box" style="display: none;">
+                    <h3>Hasil Perhitungan</h3>
+                    <div class="ipk-display">
+                        <span class="ipk-label">IPK:</span>
+                        <span id="ipk-value" class="ipk-value">0.00</span>
+                    </div>
+                    <p id="result-info"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let matkulCount = 0;
+
+        // Tambah mata kuliah pertama saat load
+        window.onload = function() {
+            tambahMatkul();
+        };
+
+        function tambahMatkul() {
+            matkulCount++;
+            const matkulList = document.getElementById('matkul-list');
+            
+            const matkulDiv = document.createElement('div');
+            matkulDiv.className = 'matkul-item';
+            matkulDiv.id = `matkul-${matkulCount}`;
+            
+            matkulDiv.innerHTML = `
+                <div class="matkul-header">
+                    <span>Mata Kuliah ${matkulCount}</span>
+                    <button onclick="hapusMatkul(${matkulCount})" class="btn-delete">×</button>
+                </div>
+                <input type="text" placeholder="Nama Mata Kuliah" class="matkul-nama" required>
+                <input type="number" placeholder="SKS" class="matkul-sks" min="1" max="6" required>
+                <select class="matkul-nilai" required>
+                    <option value="">Pilih Nilai</option>
+                    <option value="A">A (4.0)</option>
+                    <option value="A-">A- (3.7)</option>
+                    <option value="B+">B+ (3.3)</option>
+                    <option value="B">B (3.0)</option>
+                    <option value="B-">B- (2.7)</option>
+                    <option value="C+">C+ (2.3)</option>
+                    <option value="C">C (2.0)</option>
+                    <option value="D">D (1.0)</option>
+                    <option value="E">E (0.0)</option>
+                </select>
+            `;
+            
+            matkulList.appendChild(matkulDiv);
+        }
+
+        function hapusMatkul(id) {
+            const element = document.getElementById(`matkul-${id}`);
+            if (element) {
+                element.remove();
+            }
+        }
+
+        async function hitungIPK() {
+            const matkulItems = document.querySelectorAll('.matkul-item');
+            const mataKuliah = [];
+            
+            let valid = true;
+            matkulItems.forEach(item => {
+                const nama = item.querySelector('.matkul-nama').value;
+                const sks = item.querySelector('.matkul-sks').value;
+                const nilai = item.querySelector('.matkul-nilai').value;
+                
+                if (!nama || !sks || !nilai) {
+                    valid = false;
+                    return;
+                }
+                
+                mataKuliah.push({
+                    nama: nama,
+                    sks: parseInt(sks),
+                    nilai: nilai
+                });
+            });
+            
+            if (!valid || mataKuliah.length === 0) {
+                alert('Mohon lengkapi semua data mata kuliah!');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ mata_kuliah: mataKuliah })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('ipk-value').textContent = data.ipk.toFixed(2);
+                    document.getElementById('result-info').textContent = 
+                        `Total ${data.total_matkul} mata kuliah`;
+                    document.getElementById('result').style.display = 'block';
+                    
+                    // Predikat
+                    let predikat = '';
+                    if (data.ipk >= 3.5) predikat = 'Cumlaude! 🌟';
+                    else if (data.ipk >= 3.0) predikat = 'Sangat Memuaskan 👏';
+                    else if (data.ipk >= 2.5) predikat = 'Memuaskan 👍';
+                    else predikat = 'Perlu Ditingkatkan 💪';
+                    
+                    document.getElementById('result-info').textContent += ` - ${predikat}`;
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Terjadi kesalahan: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
